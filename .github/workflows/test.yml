@@ -1,0 +1,25 @@
+name: test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build the native helper
+        shell: powershell
+        run: powershell -ExecutionPolicy Bypass -File native/build.ps1
+
+      - name: Plugin modules
+        run: node test/modules-check.cjs
+
+      - name: Native helper
+        run: node test/helper-smoke.cjs
