@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "Desktop operator",
+    "description": "Gives the agent eyes and hands on this Windows desktop: screenshots, UI Automation trees with readable text, real mouse and keyboard input, and DevTools access to the pages of a logged-in browser.",
+    "detail": "docs/DETAIL.md"
+  }
+}

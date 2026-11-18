@@ -1,0 +1,10 @@
+# Normalize line endings on commit; the helper script and C# source are portable.
+* text=auto
+
+*.ps1 text eol=crlf
+*.cs text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.svg text eol=lf

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Desktop operator">
+  <rect x="4" y="10" width="56" height="42" rx="5" fill="none" stroke="#2f6fed" stroke-width="3.5"/>
+  <path d="M4 20h56" stroke="#2f6fed" stroke-width="3.5"/>
+  <circle cx="11" cy="15" r="2" fill="#2f6fed"/>
+  <circle cx="18" cy="15" r="2" fill="#2f6fed"/>
+  <path d="M27 27l16 15-7.4 1.1 4.2 8.2-5.2 2.6-4.1-8.3-5 4.9z"
+        fill="#ffffff" stroke="#1b3f8f" stroke-width="2.6" stroke-linejoin="round"/>
+</svg>

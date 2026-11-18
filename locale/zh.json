@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "桌面操作插件",
+    "description": "让智能体能看见并操作本机 Windows 桌面：截图、带可读文本的 UI Automation 控件树、真实鼠标键盘输入，以及通过 DevTools 读取已登录浏览器里的页面。",
+    "detail": "docs/DETAIL.md"
+  }
+}

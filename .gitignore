@@ -1,0 +1,11 @@
+# Build output: run native/build.ps1 to produce this executable.
+native/gui-operator.exe
+
+# Harness profile links and dependencies
+node_modules/
+pnpm-lock.yaml
+
+# Local noise
+*.log
+Thumbs.db
+.DS_Store

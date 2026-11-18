@@ -1,0 +1,30 @@
+{
+  "name": "@local/dsh-gui-operator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Lets the agent see and operate this Windows desktop and the pages of a logged-in browser.",
+  "type": "module",
+  "engines": {
+    "dsh": ">=0.2.0"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "lib",
+    "native",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "docs",
+    "icon.svg",
+    "README.md"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}
