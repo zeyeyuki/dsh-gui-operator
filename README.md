@@ -86,6 +86,8 @@ desktop_act     { "action": "key",   "keys": "ctrl+s" }
 
 ## 设计取舍 / Design notes
 
+- **常驻路由提示**：插件会注册一段系统提示（`gui-operator-routing`），明确"看屏幕 / 点软件 / 登录后才能看到的页面"这类请求该用这些工具，而不是让模型自己想起工具列表里还有它。工具描述开头也写明了触发场景。
+  A routing prompt section names the situations that should select these tools, so the capability is discoverable without the user knowing it exists.
 - **元素引用带身份**：`ref` = hwnd + 控件路径 + 类型 + 名称；动作前重新解析并校验，过期返回 `STALE_ELEMENT`，最小化/离屏/窗口不在前台分别拒绝，不会"点到邻居"。
   Refs carry identity (window handle, control path, type, name) and are re-validated before acting; stale, minimized, offscreen and unfocused targets fail loudly.
 - **前台校验**：`SetForegroundWindow` 可能被 Windows 拒绝；现在会先试 Alt 解锁，仍失败就报 `FOCUS_REJECTED`，避免文字打进别的窗口。

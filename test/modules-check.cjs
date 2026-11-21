@@ -15,7 +15,7 @@ async function main() {
   const plugin = await import(pathToFileURL(path.join(root, 'index.js')).href)
 
   assert.strictEqual(plugin.name, 'gui-operator', 'unexpected plugin name')
-  assert.deepStrictEqual([...plugin.inject], ['tools'], 'the plugin must inject the tools service')
+  assert.deepStrictEqual([...plugin.inject], ['tools', 'systemPrompt'], 'the plugin must inject the tools and systemPrompt services')
   assert.strictEqual(typeof plugin.apply, 'function', 'apply() must be exported')
 
   // Every source file must parse as an ES module.

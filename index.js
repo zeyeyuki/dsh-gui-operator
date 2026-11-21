@@ -23,7 +23,21 @@ import { DEFAULT_PORT, PROFILE_DIR, actOnPage, observePage, openBrowser } from '
 import { encodeText, runOperator, withDesktopLock } from './lib/operator.js'
 
 export const name = 'gui-operator'
-export const inject = ['tools']
+export const inject = ['tools', 'systemPrompt']
+
+/**
+ * Always-on routing hint. Tool descriptions alone are easy to overlook: a model
+ * facing a fresh request tends to reach for HTTP or file tools and never consider
+ * that it could look at the screen. This section names the situations, so the
+ * capability is discoverable without the user knowing it exists.
+ */
+const ROUTING_SECTION = `Desktop and browser control (gui-operator plugin).
+This machine can be seen and driven. Use these tools instead of guessing, asking the user to do it, or claiming you cannot see anything, whenever the request involves:
+- what is on screen, an app window, a dialog, a menu, or anything you would need to look at (desktop_observe; it also reads document and input text);
+- clicking, typing, hotkeys, dragging, scrolling inside a native app (desktop_act);
+- a web page behind a login, a session, a private dashboard, a form, or a rendered UI that HTTP fetching cannot see (browser_open, browser_observe, browser_act);
+- Chinese phrasings such as 看一下屏幕 / 截图 / 帮我点一下 / 在这个软件里 / 登录后才能看到的页面 / 浏览器里那个页面.
+Prefer browser_* over web_fetch or research for anything behind a login. Observe, take one action, then observe again to verify. If a tool reports a failure, report that failure rather than concluding the task is impossible.`
 
 /** Bound for a whole desktop action, including app-side hangs. */
 const ACTION_TIMEOUT_MS = 20_000
@@ -254,7 +268,7 @@ function describeObservation(result, added, options) {
 const desktopObserve = {
   name: 'desktop_observe',
   description:
-    'Look at this Windows desktop: capture a screenshot and list the top-level windows, then read one window\'s UI Automation tree (buttons, menus, edit boxes with their values, and text content). Use it before any desktop action and again after an action that changed the screen. Element refs such as e12 are only valid for the window they came from and only until the next desktop_observe of that window.',
+    'See this Windows desktop: capture a screenshot and list the top-level windows, then read one window\'s UI Automation tree (buttons, menus, edit boxes with their values, and text content). Use it whenever the request needs looking at the screen or reading an app\'s content, and before any desktop action and again after an action that changed the screen. Element refs such as e12 are only valid for the window they came from and only until the next desktop_observe of that window.',
   parameters: {
     type: 'object',
     additionalProperties: false,
@@ -312,7 +326,7 @@ const desktopObserve = {
 const desktopAct = {
   name: 'desktop_act',
   description:
-    'Operate this Windows desktop: click (by element ref or screen coordinates), double-click, right-click, move, drag, scroll, press a key combination, or type text. Coordinates are physical screen pixels, the same space desktop_observe reports. Typing pastes the text, so CJK and emoji work, and the previous clipboard content is restored afterwards. One action per call; observe again when you need to see the result.',
+    'Operate this Windows desktop: click (by element ref or screen coordinates), double-click, right-click, move, drag, scroll, press a key combination, or type text. Use it when the user asks to click, type, open, or drive an app\'s GUI rather than run a command. Coordinates are physical screen pixels, the same space desktop_observe reports. Typing sends Unicode key events, so CJK and emoji work and the clipboard is left alone. One action per call; observe again when you need to see the result.',
   parameters: {
     type: 'object',
     additionalProperties: false,
@@ -455,7 +469,7 @@ async function runDesktopAction(args) {
 const browserOpen = {
   name: 'browser_open',
   description:
-    'Start Microsoft Edge or Google Chrome with a debugging port and a private persistent profile, which is what lets the agent read pages that require a login. Log in once in that window and the session survives restarts. Reuses an already running debugging browser on the same port.',
+    'Start Microsoft Edge or Google Chrome with a debugging port and a private persistent profile, which is what lets the agent read pages that require a login. Use it first whenever a request needs a page behind a login, a private dashboard, or a session the HTTP tools cannot see; then sign in yourself in that window (the session survives restarts) and call browser_observe. Reuses an already running debugging browser on the same port.',
   parameters: {
     type: 'object',
     additionalProperties: false,
@@ -490,7 +504,7 @@ const browserOpen = {
 const browserObserve = {
   name: 'browser_observe',
   description:
-    'Read a page in the debugging browser: URL, title, visible text, form fields (with current values, never passwords), and clickable elements with CSS selectors. This works on pages behind a login because it reads the user\'s own browser session. Run browser_open first; if the port is not listening the call fails with that hint.',
+    'Read a page in the debugging browser: URL, title, visible text, form fields (with current values, never passwords), and clickable elements with CSS selectors. Use it for any page behind a login or rendered UI where web_fetch would only get a login screen or nothing. This works on pages behind a login because it reads the user\'s own browser session. Run browser_open first; if the port is not listening the call fails with that hint.',
   parameters: {
     type: 'object',
     additionalProperties: false,
@@ -561,7 +575,7 @@ const browserObserve = {
 const browserAct = {
   name: 'browser_act',
   description:
-    'Operate a page in the debugging browser: navigate, click, type, press keys, scroll, run page script, take a screenshot, or manage tabs. Clicking dispatches a real mouse event at the element center. After acting, call browser_observe to read the new state.',
+    'Operate a page in the debugging browser: navigate, click, type, press keys, scroll, run page script, take a screenshot, or manage tabs. Use it when the user asks to do something on a site rather than just read it, including pages behind a login. Clicking dispatches a real mouse event at the element center. After acting, call browser_observe to read the new state.',
   parameters: {
     type: 'object',
     additionalProperties: false,
@@ -656,4 +670,11 @@ export function apply(ctx) {
   for (const definition of definitions) {
     ctx.effect(() => ctx.tools.register(definition))
   }
+  // Order only positions the text among the other prompt sections; the name is
+  // what must stay unique.
+  ctx.effect(() => ctx.systemPrompt.section({
+    name: 'gui-operator-routing',
+    order: 60,
+    text: ROUTING_SECTION,
+  }))
 }
